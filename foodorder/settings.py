@@ -3,7 +3,7 @@ Django settings for the Food Ordering System project.
 """
 import os
 from pathlib import Path
-
+import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ---------------------------------------------------------------------------
@@ -17,8 +17,7 @@ SECRET_KEY = os.environ.get(
 # Set DEBUG = False in production
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.onrender.com']
 # ---------------------------------------------------------------------------
 # APPLICATIONS
 # ---------------------------------------------------------------------------
@@ -81,19 +80,32 @@ WSGI_APPLICATION = 'foodorder.wsgi.application'
 # Credentials are read from environment variables with sensible local
 # defaults, so you only need to export them (or edit the defaults below)
 # to match your MySQL Workbench / phpMyAdmin setup.
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DB_NAME', 'foodorder_db'),
-        'USER': os.environ.get('DB_USER', 'root'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'user'),
-        'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
-        'PORT': os.environ.get('DB_PORT', '3306'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    # Production database (Render PostgreSQL)
+    DATABASES = {
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    # Local database (MySQL)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('DB_NAME', 'foodorder_db'),
+            'USER': os.environ.get('DB_USER', 'root'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', 'user'),
+            'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
+            'PORT': os.environ.get('DB_PORT', '3306'),
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+            },
+        }
+    }
 
 # ---------------------------------------------------------------------------
 # AUTH
