@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Payment{% endblock %}
+{% block extra_head %}
+<style>
+.pay-wrap { max-width: 920px; }
+.pay-summary-card {
+    background: linear-gradient(135deg, #1c1c1c, #3a0d12);
+    color: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+.pay-summary-card::after {
+    content: "";
+    position: absolute; right: -40px; top: -40px;
+    width: 160px; height: 160px; border-radius: 50%;
+    background: rgba(255,255,255,.06);
+}
+.pay-summary-card .chip {
+    width: 42px; height: 30px; border-radius: 6px;
+    background: linear-gradient(135deg, #d4af37, #f5e7a1);
+    margin-bottom: 1.5rem;
+}
+.pay-summary-card .card-number { font-size: 1.3rem; letter-spacing: 3px; font-family: 'Consolas', monospace; }
+.pay-form-card { border-radius: 16px; border: 1px solid #eee; padding: 2rem; box-shadow: 0 6px 24px rgba(0,0,0,.06); }
+.pay-form-card .form-control, .pay-form-card .form-select { padding: .65rem .85rem; border-radius: 8px; }
+.pay-form-card .form-control:focus, .pay-form-card .form-select:focus { border-color: var(--fos-red); box-shadow: 0 0 0 .2rem rgba(220,53,69,.12); }
+.secure-badge { font-size: .78rem; color: #6c757d; }
+.pay-brands i { font-size: 1.4rem; margin-right: .5rem; color: #adb5bd; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="pay-wrap mx-auto">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold mb-1">Complete Your Payment</h3>
+            <p class="text-muted small mb-0">
+                <i class="fa fa-shield-alt me-1"></i>
+                This is a simulated payment gateway for demonstration purposes only. No real card processing occurs.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-5">
+                <div class="pay-summary-card mb-3">
+                    <div class="chip"></div>
+                    <div class="card-number mb-4" id="cardPreviewNumber">•••• •••• •••• ••••</div>
+                    <div class="d-flex justify-content-between small opacity-75">
+                        <span id="cardPreviewName">CARDHOLDER NAME</span>
+                        <span id="cardPreviewExpiry">MM/YY</span>
+                    </div>
+                </div>
+                <div class="border rounded-3 p-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Order Number</span>
+                        <strong>{{ order.order_number }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between fs-5">
+                        <span class="fw-semibold">Amount to Pay</span>
+                        <strong class="text-danger">Rs. {{ order.total_amount }}</strong>
+                    </div>
+                </div>
+                <div class="pay-brands text-center mt-3">
+                    <i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-cc-amex"></i>
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                <div class="pay-form-card">
+                    <form method="post" id="paymentForm">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}<div class="text-danger small">{{ field.errors|striptags }}</div>{% endif %}
+                        </div>
+                        {% endfor %}
+                        <button type="submit" id="payBtn" class="btn btn-danger w-100 py-2 fw-semibold">
+                            <i class="fa fa-lock me-1"></i> Pay Rs. {{ order.total_amount }}
+                        </button>
+                        <p class="secure-badge text-center mt-2 mb-0"><i class="fa fa-shield-alt me-1"></i>256-bit encrypted (simulated)</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loadingOverlay" class="d-none position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="background:rgba(255,255,255,0.92); z-index:1050;">
+    <div class="spinner-border text-danger mb-3" style="width:3rem;height:3rem;" role="status"></div>
+    <p class="fw-bold mb-0">Processing your payment&hellip;</p>
+    <p class="text-muted small">Please don't close this window</p>
+</div>
+
+{% block extra_scripts %}
+<script>
+document.getElementById('paymentForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    document.getElementById('loadingOverlay').classList.remove('d-none');
+    const form = this;
+    setTimeout(function () { form.submit(); }, 2200);
+});
+
+// Live card preview - purely cosmetic, mirrors what's typed into the form
+function bindPreview(fieldName, targetId, formatter) {
+    const el = document.querySelector(`[name="${fieldName}"]`);
+    const target = document.getElementById(targetId);
+    if (!el || !target) return;
+    el.addEventListener('input', () => { target.textContent = formatter(el.value); });
+}
+bindPreview('card_number', 'cardPreviewNumber', v => {
+    const digits = v.replace(/\D/g, '').padEnd(16, '•');
+    return digits.replace(/(.{4})/g, '$1 ').trim();
+});
+bindPreview('cardholder_name', 'cardPreviewName', v => v ? v.toUpperCase() : 'CARDHOLDER NAME');
+function updateExpiry() {
+    const m = document.querySelector('[name="expiry_month"]');
+    const y = document.querySelector('[name="expiry_year"]');
+    const target = document.getElementById('cardPreviewExpiry');
+    if (m && y && target) target.textContent = `${m.value || 'MM'}/${(y.value || 'YYYY').toString().slice(-2)}`;
+}
+document.querySelector('[name="expiry_month"]')?.addEventListener('change', updateExpiry);
+document.querySelector('[name="expiry_year"]')?.addEventListener('change', updateExpiry);
+</script>
+{% endblock %}
+{% endblock %}

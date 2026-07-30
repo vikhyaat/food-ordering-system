@@ -1,0 +1,48 @@
+{% extends "dashboard/_base_dashboard.html" %}
+{% block title %}Reports{% endblock %}
+{% block dashboard_content %}
+<h4 class="fw-bold mb-3">Sales Reports</h4>
+<div class="row g-3 mb-4">
+    {% for label, data in sales_summary.items %}
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="label">{{ label }} Sales</div>
+            <h2>Rs. {{ data.total|default:0 }}</h2>
+            <div class="text-muted small">{{ data.count }} orders</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6 class="fw-bold">Food-wise Sales</h6>
+            <table class="table table-sm mb-0">
+                <thead><tr><th>Food</th><th>Qty Sold</th><th>Revenue</th></tr></thead>
+                <tbody>
+                {% for f in food_wise %}
+                <tr><td>{{ f.food_name }}</td><td>{{ f.total_qty }}</td><td>Rs. {{ f.total_sales }}</td></tr>
+                {% empty %}<tr><td colspan="3" class="text-muted">No data yet.</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6 class="fw-bold">Customer-wise Orders</h6>
+            <table class="table table-sm mb-0">
+                <thead><tr><th>Customer</th><th>Orders</th><th>Total Spent</th></tr></thead>
+                <tbody>
+                {% for c in customer_wise %}
+                <tr><td>{{ c.full_name }}</td><td>{{ c.order_count }}</td><td>Rs. {{ c.total_spent }}</td></tr>
+                {% empty %}<tr><td colspan="3" class="text-muted">No data yet.</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<a href="{% url 'dashboard:export_orders_csv' %}" class="btn btn-outline-dark mt-4"><i class="fa fa-file-csv me-1"></i>Export All Orders (CSV)</a>
+<p class="text-muted small mt-2">PDF / Excel export can be added the same way as the invoice/receipt PDFs (see README) &mdash; CSV is included by default for the MVP.</p>
+{% endblock %}

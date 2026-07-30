@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+{% block extra_head %}
+<style>
+.step-track { display: flex; align-items: center; justify-content: center; margin-bottom: 2.5rem; }
+.step { display: flex; flex-direction: column; align-items: center; position: relative; flex: 1; max-width: 160px; }
+.step .circle {
+    width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: .9rem; border: 2px solid #e2e2e2; color: #aaa; background: #fff; z-index: 2;
+}
+.step.active .circle, .step.done .circle { background: var(--fos-red); border-color: var(--fos-red); color: #fff; }
+.step .label { font-size: .8rem; margin-top: .4rem; color: #999; font-weight: 600; }
+.step.active .label, .step.done .label { color: var(--fos-red); }
+.step:not(:last-child)::after {
+    content: ""; position: absolute; top: 19px; left: 50%; width: 100%; height: 2px; background: #e2e2e2; z-index: 1;
+}
+.step.done:not(:last-child)::after { background: var(--fos-red); }
+
+.checkout-form-card { border-radius: 16px; border: 1px solid #eee; padding: 2rem; }
+.checkout-form-card .form-control, .checkout-form-card textarea { border-radius: 8px; padding: .6rem .85rem; }
+.checkout-form-card .form-control:focus, .checkout-form-card textarea:focus {
+    border-color: var(--fos-red); box-shadow: 0 0 0 .2rem rgba(220,53,69,.12);
+}
+.checkout-form-card .field-icon { color: var(--fos-red); width: 18px; margin-right: .4rem; }
+
+.summary-card { border-radius: 16px; border: 1px solid #eee; padding: 1.75rem; }
+.summary-item-row { display: flex; align-items: center; gap: .6rem; padding: .5rem 0; border-bottom: 1px dashed #eee; }
+.summary-item-row img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; }
+.summary-item-row .name { font-size: .88rem; font-weight: 600; }
+.summary-item-row .qty { font-size: .78rem; color: #999; }
+.summary-total-line { display: flex; justify-content: space-between; padding: .3rem 0; font-size: .92rem; color: #555; }
+.summary-grand-total { display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 700; margin-top: .6rem; padding-top: .6rem; border-top: 2px solid #f2f2f2; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container py-5">
+
+    <div class="step-track">
+        <div class="step done">
+            <div class="circle"><i class="fa fa-check"></i></div>
+            <div class="label">Cart</div>
+        </div>
+        <div class="step active">
+            <div class="circle">2</div>
+            <div class="label">Delivery Details</div>
+        </div>
+        <div class="step">
+            <div class="circle">3</div>
+            <div class="label">Payment</div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-7">
+            <div class="checkout-form-card">
+                <h5 class="fw-bold mb-4"><i class="fa fa-map-marker-alt text-danger me-2"></i>Where should we deliver?</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        {% for field in form %}
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-semibold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}<div class="text-danger small">{{ field.errors|striptags }}</div>{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100 py-2 fw-semibold mt-2">
+                        Continue to Payment <i class="fa fa-arrow-right ms-1"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="summary-card">
+                <h6 class="fw-bold mb-3"><i class="fa fa-receipt text-danger me-2"></i>Order Summary</h6>
+                <div class="mb-2" style="max-height: 260px; overflow-y: auto;">
+                    {% for item in items %}
+                    <div class="summary-item-row">
+                        {% if item.food_item.image %}
+                            <img src="{{ item.food_item.image.url }}" alt="{{ item.food_item.name }}">
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100" alt="{{ item.food_item.name }}">
+                        {% endif %}
+                        <div class="flex-grow-1">
+                            <div class="name">{{ item.food_item.name }}</div>
+                            <div class="qty">Qty {{ item.quantity }}</div>
+                        </div>
+                        <span class="small fw-semibold">Rs. {{ item.line_total }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="summary-total-line"><span>Subtotal</span><span>Rs. {{ subtotal }}</span></div>
+                <div class="summary-total-line"><span>Tax</span><span>Rs. {{ tax }}</span></div>
+                <div class="summary-total-line"><span>Delivery</span><span>Rs. {{ delivery }}</span></div>
+                <div class="summary-grand-total"><span>Total</span><span class="text-danger">Rs. {{ total }}</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

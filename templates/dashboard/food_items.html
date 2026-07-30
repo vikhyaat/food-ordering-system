@@ -1,0 +1,31 @@
+{% extends "dashboard/_base_dashboard.html" %}
+{% block title %}Food Menu{% endblock %}
+{% block dashboard_content %}
+<div class="d-flex justify-content-between mb-3">
+    <h4 class="fw-bold">Food Menu</h4>
+    <a href="{% url 'dashboard:add_food' %}" class="btn btn-danger"><i class="fa fa-plus me-1"></i>Add Food Item</a>
+</div>
+<div class="card p-3">
+    <table class="table align-middle mb-0">
+        <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Available</th><th>Featured</th><th>Actions</th></tr></thead>
+        <tbody>
+        {% for item in food_items %}
+        <tr>
+            <td>{% if item.image %}<img src="{{ item.image.url }}" style="width:50px;height:50px;object-fit:cover;">{% else %}-{% endif %}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.category.name }}</td>
+            <td>Rs. {{ item.price }}</td>
+            <td>{% if item.is_available %}<span class="badge bg-success">Yes</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}</td>
+            <td>{% if item.is_featured %}<span class="badge bg-warning text-dark">Yes</span>{% else %}-{% endif %}</td>
+            <td>
+                <a href="{% url 'dashboard:edit_food' item.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                <form method="post" action="{% url 'dashboard:delete_food' item.pk %}" class="d-inline" onsubmit="return confirm('Delete this item?');">
+                    {% csrf_token %}<button class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}<tr><td colspan="7" class="text-muted">No food items yet.</td></tr>{% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

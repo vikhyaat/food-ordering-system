@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Order #{{ order.order_number }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="fw-bold mb-1">Order # {{ order.order_number }}</h2>
+    <p class="text-muted">Placed on {{ order.created_at|date:"Y-m-d H:i" }}</p>
+
+    <div class="row g-4">
+        <div class="col-md-8">
+            <div class="card p-4 mb-4">
+                <h5 class="fw-bold mb-3">Items</h5>
+                <table class="table">
+                    <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+                    <tbody>
+                    {% for item in order.items.all %}
+                        <tr><td>{{ item.food_name }}</td><td>{{ item.quantity }}</td><td>Rs. {{ item.price }}</td><td>Rs. {{ item.line_total }}</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card p-4">
+                <h5 class="fw-bold mb-3">Order Tracking Timeline</h5>
+                <ul class="list-group list-group-flush">
+                    {% for h in order.status_history.all %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ h.get_status_display }}</span>
+                        <span class="text-muted small">{{ h.changed_at|date:"Y-m-d H:i" }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4 mb-3">
+                <h5 class="fw-bold mb-3">Summary</h5>
+                <div class="d-flex justify-content-between"><span>Subtotal</span><span>Rs. {{ order.subtotal }}</span></div>
+                <div class="d-flex justify-content-between"><span>Tax</span><span>Rs. {{ order.tax }}</span></div>
+                <div class="d-flex justify-content-between"><span>Delivery</span><span>Rs. {{ order.delivery_charge }}</span></div>
+                <hr>
+                <div class="d-flex justify-content-between fw-bold fs-5"><span>Total</span><span>Rs. {{ order.total_amount }}</span></div>
+                <span class="badge bg-{% if order.status == 'delivered' %}success{% elif order.status == 'cancelled' %}danger{% else %}secondary{% endif %} mt-2">{{ order.get_status_display }}</span>
+            </div>
+            <div class="card p-4">
+                <h6 class="fw-bold mb-2">Delivery Address</h6>
+                <p class="small mb-1">{{ order.full_name }} | {{ order.phone }}</p>
+                <p class="small mb-3">{{ order.address }}, {{ order.city }}, {{ order.state }} - {{ order.pincode }}</p>
+
+                {% if order.is_paid %}
+                <a href="{% url 'orders:download_invoice' order.id %}" class="btn btn-outline-dark btn-sm w-100 mb-2"><i class="fa fa-file-pdf me-1"></i>Download Invoice</a>
+                <a href="{% url 'payments:download_receipt' order.id %}" class="btn btn-outline-dark btn-sm w-100 mb-2"><i class="fa fa-receipt me-1"></i>Download Receipt</a>
+                {% else %}
+                <a href="{% url 'payments:pay' order.id %}" class="btn btn-danger btn-sm w-100 mb-2">Pay Now</a>
+                {% endif %}
+
+                {% if order.can_cancel %}
+                <form method="post" action="{% url 'orders:cancel_order' order.id %}" onsubmit="return confirm('Cancel this order?');">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-danger btn-sm w-100">Cancel Order</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

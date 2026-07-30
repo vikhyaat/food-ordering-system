@@ -1,0 +1,18 @@
+{% extends "dashboard/_base_dashboard.html" %}
+{% block title %}{% if food_item %}Edit{% else %}Add{% endif %} Food Item{% endblock %}
+{% block dashboard_content %}
+<h4 class="fw-bold mb-3">{% if food_item %}Edit{% else %}Add{% endif %} Food Item</h4>
+<div class="card p-4" style="max-width:600px;">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+            <label class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="text-danger small">{{ field.errors|striptags }}</div>{% endif %}
+        </div>
+        {% endfor %}
+        <button class="btn btn-danger w-100">Save</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Food Menu{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="fw-bold mb-4">Food Menu</h2>
+    <div class="row">
+        <div class="col-lg-3 mb-4">
+            <div class="card p-3">
+                <h6 class="fw-bold">Filter</h6>
+                <form method="get">
+                    <input type="text" name="q" value="{{ query }}" class="form-control mb-2" placeholder="Search dish...">
+                    <label class="form-label small mb-0">Category</label>
+                    <select name="category" class="form-select mb-2" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label class="form-label small mb-0">Min Price</label>
+                    <input type="number" name="min_price" class="form-control mb-2" value="{{ request.GET.min_price }}">
+                    <label class="form-label small mb-0">Max Price</label>
+                    <input type="number" name="max_price" class="form-control mb-2" value="{{ request.GET.max_price }}">
+                    <button class="btn btn-danger w-100" type="submit">Apply</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-9">
+            <div class="row g-4">
+                {% for item in page_obj %}
+                <div class="col-md-4">
+                    {% include "menu/_food_card.html" with item=item %}
+                </div>
+                {% empty %}
+                <p class="text-muted">No food items match your filters.</p>
+                {% endfor %}
+            </div>
+            {% include "menu/_pagination.html" with page_obj=page_obj %}
+        </div>
+    </div>
+</div>
+{% endblock %}

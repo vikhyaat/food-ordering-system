@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Track Order{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="fw-bold mb-4">Track Your Order</h2>
+    <form method="get" class="d-flex gap-2 mb-4" style="max-width:500px;">
+        <input type="text" name="order_number" value="{{ request.GET.order_number }}" class="form-control" placeholder="Enter Order ID (e.g. 409347008)" required>
+        <button class="btn btn-danger px-4">Track</button>
+    </form>
+
+    {% if order %}
+    <div class="card p-4" style="max-width:600px;">
+        <h5 class="fw-bold">Order # {{ order.order_number }}</h5>
+        <p class="text-muted">Placed on {{ order.created_at|date:"Y-m-d H:i" }}</p>
+        <span class="badge bg-secondary mb-3">{{ order.get_status_display }}</span>
+        <ul class="list-group list-group-flush">
+            {% for h in order.status_history.all %}
+            <li class="list-group-item d-flex justify-content-between">
+                <span>{{ h.get_status_display }}</span>
+                <span class="text-muted small">{{ h.changed_at|date:"Y-m-d H:i" }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% elif searched %}
+    <p class="text-danger">No order found with that ID.</p>
+    {% endif %}
+</div>
+{% endblock %}

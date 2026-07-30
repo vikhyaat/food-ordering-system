@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Payment Successful{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card p-4 text-center">
+                <i class="fa fa-check-circle text-success" style="font-size:4rem;"></i>
+                <h3 class="fw-bold mt-3">Payment Successful!</h3>
+                <p class="text-muted">Your order has been placed successfully.</p>
+
+                <table class="table text-start">
+                    <tr><th>Transaction ID</th><td>{{ payment.transaction_id }}</td></tr>
+                    <tr><th>Payment ID</th><td>{{ payment.payment_id }}</td></tr>
+                    <tr><th>Order Number</th><td>{{ order.order_number }}</td></tr>
+                    <tr><th>Customer Name</th><td>{{ order.full_name }}</td></tr>
+                    <tr><th>Amount Paid</th><td>Rs. {{ payment.amount }}</td></tr>
+                    <tr><th>Payment Method</th><td>{{ payment.method }} ending in {{ payment.card_last4 }}</td></tr>
+                    <tr><th>Date &amp; Time</th><td>{{ payment.created_at|date:"Y-m-d H:i:s" }}</td></tr>
+                </table>
+
+                <div class="d-flex gap-2 justify-content-center flex-wrap">
+                    <a href="{% url 'payments:download_receipt' order.id %}" class="btn btn-outline-dark"><i class="fa fa-receipt me-1"></i>Download Receipt</a>
+                    <a href="{% url 'menu:menu_list' %}" class="btn btn-danger">Continue Shopping</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

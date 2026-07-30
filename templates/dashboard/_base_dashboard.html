@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Dashboard{% endblock %} - Food Ordering System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="d-flex">
+    <div class="admin-sidebar p-0" style="width:240px; min-width:240px;">
+        <div class="text-center py-4 border-bottom border-secondary">
+            <i class="fa fa-user-circle fa-3x mb-2"></i>
+            <div>{{ request.user.username }}</div>
+        </div>
+        <a href="{% url 'dashboard:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}"><i class="fa fa-th-large me-2"></i>Dashboard</a>
+        <a href="{% url 'dashboard:manage_users' %}" class="{% if 'user' in request.resolver_match.url_name %}active{% endif %}"><i class="fa fa-users me-2"></i>Reg Users</a>
+        <a href="{% url 'dashboard:manage_categories' %}" class="{% if 'categor' in request.resolver_match.url_name %}active{% endif %}"><i class="fa fa-list me-2"></i>Food Category</a>
+        <a href="{% url 'dashboard:manage_food' %}" class="{% if 'food' in request.resolver_match.url_name %}active{% endif %}"><i class="fa fa-utensils me-2"></i>Food Menu</a>
+        <a href="{% url 'dashboard:manage_orders' %}" class="{% if 'order' in request.resolver_match.url_name %}active{% endif %}"><i class="fa fa-receipt me-2"></i>Orders</a>
+        <a href="{% url 'dashboard:manage_payments' %}" class="{% if 'payment' in request.resolver_match.url_name %}active{% endif %}"><i class="fa fa-credit-card me-2"></i>Payments</a>
+        <a href="{% url 'dashboard:reports' %}" class="{% if 'report' in request.resolver_match.url_name %}active{% endif %}"><i class="fa fa-chart-bar me-2"></i>Reports</a>
+        <hr class="border-secondary">
+        <a href="{% url 'menu:home' %}"><i class="fa fa-globe me-2"></i>View Site</a>
+        <a href="{% url 'accounts:logout' %}"><i class="fa fa-sign-out-alt me-2"></i>Log out</a>
+    </div>
+    <div class="flex-grow-1">
+        <nav class="navbar navbar-light bg-white shadow-sm px-4">
+            <span class="fw-bold fs-5">Food Ordering System!!</span>
+            <span><i class="fa fa-bell text-muted"></i></span>
+        </nav>
+        <div class="p-4">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">{{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            {% block dashboard_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

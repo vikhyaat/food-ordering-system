@@ -1,0 +1,25 @@
+{% load static %}
+<div class="food-card">
+    {% if item.image %}
+        <img src="{{ item.image.url }}" alt="{{ item.name }}">
+    {% else %}
+        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500" alt="{{ item.name }}">
+    {% endif %}
+    <div class="food-body">
+        <a href="{% url 'menu:food_detail' item.pk %}" class="text-decoration-none text-dark">
+            <h5 class="fw-bold">{{ item.name }}</h5>
+        </a>
+        <form method="post" action="{% url 'cart:add_to_cart' item.pk %}" class="d-flex align-items-center gap-2 mb-2">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <input type="number" name="quantity" value="1" min="1" class="form-control form-control-sm" style="width:70px">
+            <span class="price ms-auto">Rs. {{ item.price }}</span>
+        </form>
+        <form method="post" action="{% url 'cart:add_to_cart' item.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="quantity" value="1">
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button type="submit" class="btn btn-danger w-100">Order Now</button>
+        </form>
+    </div>
+</div>

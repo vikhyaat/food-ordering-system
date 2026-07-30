@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Food Ordering System - Delicious Food, Delivered{% endblock %}
+
+{% block content %}
+<div class="hero" style="background-image:url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1600');">
+    <div class="hero-content">
+        <div class="script">Delicious <span>Food</span></div>
+        <h1 class="fw-bold display-5">Order Delivery &amp; Take-Out</h1>
+        <form method="get" action="{% url 'menu:home' %}" class="d-flex mt-4">
+            <input type="text" name="q" value="{{ query }}" class="form-control form-control-lg me-2" placeholder="Dish Name">
+            <button class="btn btn-danger btn-lg px-4" type="submit">Search</button>
+        </form>
+    </div>
+</div>
+
+<div class="container py-5">
+
+    {% if categories %}
+    <div class="text-center mb-5">
+        {% for cat in categories %}
+        <a href="{% url 'menu:menu_list' %}?category={{ cat.id }}" class="category-pill">{{ cat.name }}</a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if featured %}
+    <h3 class="fw-bold mb-4">Featured Foods</h3>
+    <div class="row g-4 mb-5">
+        {% for item in featured %}
+        <div class="col-md-4">
+            {% include "menu/_food_card.html" with item=item %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <h3 class="fw-bold mb-4">{% if query %}Search results for "{{ query }}"{% else %}Popular Foods{% endif %}</h3>
+    <div class="row g-4">
+        {% for item in page_obj %}
+        <div class="col-md-4">
+            {% include "menu/_food_card.html" with item=item %}
+        </div>
+        {% empty %}
+        <p class="text-muted">No food items found.</p>
+        {% endfor %}
+    </div>
+
+    {% include "menu/_pagination.html" with page_obj=page_obj %}
+</div>
+{% endblock %}

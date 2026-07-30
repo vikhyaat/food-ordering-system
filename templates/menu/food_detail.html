@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}{{ food_item.name }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row g-5">
+        <div class="col-md-6">
+            {% if food_item.image %}
+            <img src="{{ food_item.image.url }}" class="img-fluid rounded" alt="{{ food_item.name }}">
+            {% else %}
+            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800" class="img-fluid rounded" alt="{{ food_item.name }}">
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <h2 class="fw-bold">{{ food_item.name }}</h2>
+            <p class="text-muted">{{ food_item.category.name }}</p>
+            <h3 class="text-danger fw-bold">Rs. {{ food_item.price }}</h3>
+            <p>{{ food_item.description }}</p>
+
+            <form method="post" action="{% url 'cart:add_to_cart' food_item.pk %}" class="d-flex gap-2 mb-3">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <input type="number" name="quantity" value="1" min="1" class="form-control" style="width:100px">
+                <button type="submit" class="btn btn-danger px-4">Add to Cart</button>
+            </form>
+
+            {% if user.is_authenticated %}
+            <a href="{% url 'menu:toggle_wishlist' food_item.pk %}" class="btn btn-outline-danger">
+                <i class="fa{% if is_wishlisted %}s{% else %}r{% endif %} fa-heart me-1"></i>
+                {% if is_wishlisted %}Remove from Favourites{% else %}Add to Favourites{% endif %}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <hr class="my-5">
+    <h4 class="fw-bold mb-3">Customer Reviews</h4>
+    {% if user.is_authenticated %}
+    <form method="post" class="card p-3 mb-4" style="max-width:500px;">
+        {% csrf_token %}
+        <label class="form-label">Rating</label>
+        <select name="rating" class="form-select mb-2">
+            {% for i in "12345" %}<option value="{{ i }}">{{ i }} star{{ i|pluralize }}</option>{% endfor %}
+        </select>
+        <textarea name="comment" class="form-control mb-2" rows="2" placeholder="Write your review..."></textarea>
+        <button class="btn btn-danger">Submit Review</button>
+    </form>
+    {% endif %}
+    {% for review in reviews %}
+    <div class="border-bottom py-2">
+        <strong>{{ review.user.username }}</strong> - {{ review.rating }}★
+        <p class="mb-0 text-muted">{{ review.comment }}</p>
+    </div>
+    {% empty %}
+    <p class="text-muted">No reviews yet.</p>
+    {% endfor %}
+
+    {% if related %}
+    <h4 class="fw-bold mt-5 mb-3">You might also like</h4>
+    <div class="row g-4">
+        {% for item in related %}
+        <div class="col-md-3">{% include "menu/_food_card.html" with item=item %}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

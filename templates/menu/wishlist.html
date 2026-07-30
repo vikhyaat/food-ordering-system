@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}My Favourites{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="fw-bold mb-4">My Favourites</h2>
+    <div class="row g-4">
+        {% for w in items %}
+        <div class="col-md-4">{% include "menu/_food_card.html" with item=w.food_item %}</div>
+        {% empty %}
+        <p class="text-muted">You haven't favourited any food yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

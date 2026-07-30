@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}My Orders{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-3">{% include "accounts/_account_sidebar.html" %}</div>
+        <div class="col-md-9">
+            <h2 class="fw-bold mb-4">My Orders</h2>
+            {% for order in orders %}
+            <div class="card p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div>
+                        <div class="text-danger small">Order Date: {{ order.created_at|date:"Y-m-d H:i:s" }}</div>
+                        <div class="fw-bold fs-5">Order # {{ order.order_number }}</div>
+                        <span class="badge bg-secondary order-status-badge">{{ order.get_status_display }}</span>
+                        {% if not order.is_paid %}<span class="badge bg-warning text-dark order-status-badge">Payment Pending</span>{% endif %}
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold mb-2">Rs. {{ order.total_amount }}</div>
+                        <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-dark btn-sm">Order Details</a>
+                        {% if not order.is_paid %}
+                        <a href="{% url 'payments:pay' order.id %}" class="btn btn-danger btn-sm">Pay Now</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-muted">You haven't placed any orders yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

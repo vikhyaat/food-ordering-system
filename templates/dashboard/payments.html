@@ -1,0 +1,29 @@
+{% extends "dashboard/_base_dashboard.html" %}
+{% block title %}Payments{% endblock %}
+{% block dashboard_content %}
+<div class="d-flex justify-content-between mb-3">
+    <h4 class="fw-bold">Payment History</h4>
+    <div class="btn-group">
+        <a href="{% url 'dashboard:manage_payments' %}" class="btn btn-outline-dark {% if not status %}active{% endif %}">All</a>
+        <a href="{% url 'dashboard:manage_payments' %}?status=success" class="btn btn-outline-success {% if status == 'success' %}active{% endif %}">Successful</a>
+        <a href="{% url 'dashboard:manage_payments' %}?status=failed" class="btn btn-outline-danger {% if status == 'failed' %}active{% endif %}">Failed</a>
+    </div>
+</div>
+<div class="card p-3">
+    <table class="table align-middle mb-0">
+        <thead><tr><th>Payment ID</th><th>Transaction ID</th><th>Order #</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>
+        {% for p in payments %}
+        <tr>
+            <td>{{ p.payment_id }}</td>
+            <td>{{ p.transaction_id }}</td>
+            <td>{{ p.order.order_number }}</td>
+            <td>Rs. {{ p.amount }}</td>
+            <td>{% if p.status == 'success' %}<span class="badge bg-success">Success</span>{% else %}<span class="badge bg-danger">Failed</span>{% endif %}</td>
+            <td>{{ p.created_at|date:"Y-m-d H:i" }}</td>
+        </tr>
+        {% empty %}<tr><td colspan="6" class="text-muted">No payments yet.</td></tr>{% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

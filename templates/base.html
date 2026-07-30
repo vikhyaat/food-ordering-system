@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Food Ordering System{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<div class="topbar d-none d-md-block">
+    <div class="container d-flex justify-content-end align-items-center py-1">
+        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="text-white me-3"><i class="fab fa-google-plus-g"></i></a>
+        {% if user.is_authenticated %}
+            <span class="text-white small me-3">Hi, {{ user.first_name|default:user.username }}</span>
+            <a href="{% url 'accounts:logout' %}" class="text-white small">LOGOUT</a>
+        {% else %}
+            <a href="{% url 'accounts:login' %}" class="text-white small">LOGIN / REGISTER</a>
+        {% endif %}
+    </div>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3" href="{% url 'menu:home' %}">FOS</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMain">
+            <ul class="navbar-nav mx-auto text-center">
+                <li class="nav-item"><a class="nav-link" href="{% url 'menu:home' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'menu:menu_list' %}">Food Menu</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'orders:track_order' %}">Track Order</a></li>
+                {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'orders:order_history' %}">My Orders</a></li>
+                {% endif %}
+            </ul>
+            <a href="{% url 'cart:view_cart' %}" class="btn btn-danger fw-semibold">
+                <i class="fa fa-shopping-cart me-1"></i> My Cart
+                {% if cart_item_count %}<span class="badge bg-light text-danger ms-1">{{ cart_item_count }}</span>{% endif %}
+            </a>
+        </div>
+    </div>
+</nav>
+
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="bg-dark text-light pt-5 pb-3 mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h4 class="fw-bold">Food Ordering<br>System</h4>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h6 class="text-uppercase fw-bold mb-3">Information</h6>
+                <p class="mb-1"><i class="fa fa-angle-right me-2"></i>About us</p>
+                <p class="mb-1"><i class="fa fa-angle-right me-2"></i>Contact us</p>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h6 class="text-uppercase fw-bold mb-3">My Account</h6>
+                <p class="mb-1"><i class="fa fa-angle-right me-2"></i><a href="{% url 'accounts:profile' %}" class="text-light text-decoration-none">My Account</a></p>
+                <p class="mb-1"><i class="fa fa-angle-right me-2"></i><a href="{% url 'cart:view_cart' %}" class="text-light text-decoration-none">My Cart</a></p>
+                <p class="mb-1"><i class="fa fa-angle-right me-2"></i><a href="{% url 'orders:order_history' %}" class="text-light text-decoration-none">My Orders</a></p>
+                <p class="mb-1"><i class="fa fa-angle-right me-2"></i><a href="{% url 'orders:track_order' %}" class="text-light text-decoration-none">Track Order</a></p>
+            </div>
+            <div class="col-md-2 mb-4">
+                <h6 class="text-uppercase fw-bold mb-3">Admin</h6>
+                <a href="{% url 'dashboard:home' %}" class="text-light text-decoration-none">Admin Login</a>
+            </div>
+        </div>
+        <hr class="border-secondary">
+        <p class="text-center small mb-0">Copyright &copy; Food Ordering System 2014-2026</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

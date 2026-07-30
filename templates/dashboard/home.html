@@ -1,0 +1,43 @@
+{% extends "dashboard/_base_dashboard.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block dashboard_content %}
+<div class="row g-3">
+    <div class="col-md-4"><div class="stat-card"><div class="label">Total Orders</div><h2>{{ total_orders }}</h2></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="label">New Orders</div><h2>{{ new_orders }}</h2></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="label">Confirmed Orders</div><h2>{{ confirmed_orders }}</h2></div></div>
+
+    <div class="col-md-4"><div class="stat-card"><div class="label">Food Being Prepared</div><h2>{{ preparing_orders }}</h2></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="label">Ready / Food Pickup</div><h2>{{ ready_orders }}</h2></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="label">Out for Delivery</div><h2>{{ out_for_delivery_orders }}</h2></div></div>
+
+    <div class="col-md-4"><div class="stat-card"><div class="label">Total Delivered</div><h2>{{ delivered_orders }}</h2></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="label">Cancelled Orders</div><h2>{{ cancelled_orders }}</h2></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="label">Total Regd. Users</div><h2>{{ total_users }}</h2></div></div>
+
+    <div class="col-md-4"><div class="stat-card"><div class="label">Total Categories</div><h2>{{ total_categories }}</h2></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="label">Total Food Items</div><h2>{{ total_food_items }}</h2></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="label">Today's Sales</div><h2>Rs. {{ todays_sales }}</h2></div></div>
+
+    <div class="col-md-4"><div class="stat-card"><div class="label">Monthly Sales</div><h2>Rs. {{ monthly_sales }}</h2></div></div>
+</div>
+
+<h5 class="fw-bold mt-4 mb-3">Recent Orders</h5>
+<div class="card p-3">
+    <table class="table mb-0">
+        <thead><tr><th>Order #</th><th>Customer</th><th>Status</th><th>Total</th><th>Date</th></tr></thead>
+        <tbody>
+        {% for order in recent_orders %}
+            <tr>
+                <td>{{ order.order_number }}</td>
+                <td>{{ order.full_name }}</td>
+                <td><span class="badge bg-secondary">{{ order.get_status_display }}</span></td>
+                <td>Rs. {{ order.total_amount }}</td>
+                <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="5" class="text-muted">No orders yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

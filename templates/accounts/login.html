@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block extra_head %}
+<style>
+.auth-wrap { min-height: 88vh; }
+.auth-visual {
+    background: linear-gradient(160deg, rgba(15,15,15,.88), rgba(183,28,43,.82)),
+                url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200') center/cover;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem 3rem;
+    min-height: 88vh;
+}
+.auth-visual .script { font-family: 'Brush Script MT', cursive; font-size: 2.2rem; color: #ffb3ba; }
+.auth-visual ul { list-style: none; padding: 0; margin-top: 2rem; }
+.auth-visual ul li { padding: .5rem 0; border-bottom: 1px solid rgba(255,255,255,.15); }
+.auth-visual ul li i { color: #ff8f97; margin-right: .75rem; width: 20px; }
+
+.auth-form-side { display: flex; align-items: center; justify-content: center; padding: 3rem 2rem; }
+.auth-card { width: 100%; max-width: 400px; }
+.auth-card .form-control { padding: .7rem .9rem; border-radius: 8px; border: 1px solid #ddd; }
+.auth-card .form-control:focus { border-color: var(--fos-red); box-shadow: 0 0 0 .2rem rgba(220,53,69,.12); }
+.auth-card .btn-danger { padding: .7rem; border-radius: 8px; font-weight: 600; letter-spacing: .3px; }
+.auth-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(220,53,69,.1); color: var(--fos-red);
+    font-size: 1.4rem; margin-bottom: 1rem;
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="row g-0 auth-wrap">
+    <div class="col-lg-6 d-none d-lg-flex auth-visual">
+        <div class="script">Hungry?</div>
+        <h1 class="fw-bold display-5">Welcome back to FOS</h1>
+        <p class="fs-5 opacity-75">Sign in to reorder your favourites, track live orders, and check out faster.</p>
+        <ul>
+            <li><i class="fa fa-bolt"></i>Real-time order tracking</li>
+            <li><i class="fa fa-receipt"></i>Digital invoices &amp; receipts</li>
+            <li><i class="fa fa-heart"></i>Save your favourite dishes</li>
+        </ul>
+    </div>
+    <div class="col-lg-6 auth-form-side">
+        <div class="auth-card">
+            <div class="auth-badge"><i class="fa fa-user-lock"></i></div>
+            <h3 class="fw-bold mb-1">Login to your account</h3>
+            <p class="text-muted mb-4">Enter your details to continue ordering.</p>
+            <form method="post">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
+                {% endif %}
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Username</label>
+                    {{ form.username }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Password</label>
+                    {{ form.password }}
+                </div>
+                <button type="submit" class="btn btn-danger w-100 mt-2">Login <i class="fa fa-arrow-right ms-1"></i></button>
+            </form>
+            <div class="d-flex justify-content-between mt-3">
+                <a href="{% url 'accounts:password_reset' %}" class="small text-muted text-decoration-none">Forgot password?</a>
+                <a href="{% url 'accounts:register' %}" class="small fw-semibold text-decoration-none">Create account</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

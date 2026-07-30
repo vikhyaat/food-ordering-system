@@ -1,0 +1,17 @@
+<div class="card p-0 overflow-hidden">
+    <div class="bg-danger text-white p-3">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fa fa-user-circle fa-2x"></i>
+            <div>
+                <div class="fw-bold">{{ user.get_full_name|default:user.username }}</div>
+                <div class="small">{{ user.email }}</div>
+            </div>
+        </div>
+        <a href="{% url 'accounts:logout' %}" class="btn btn-warning btn-sm mt-2"><i class="fa fa-sign-out-alt me-1"></i>Sign Out</a>
+    </div>
+    <div class="list-group list-group-flush">
+        <a href="{% url 'orders:order_history' %}" class="list-group-item list-group-item-action"><i class="fa fa-shopping-basket me-2 text-danger"></i>My Orders</a>
+        <a href="{% url 'menu:wishlist' %}" class="list-group-item list-group-item-action"><i class="fa fa-heart me-2 text-danger"></i>My Favourites</a>
+        <a href="{% url 'accounts:profile' %}" class="list-group-item list-group-item-action"><i class="fa fa-cog me-2 text-danger"></i>Profile</a>
+    </div>
+</div>
